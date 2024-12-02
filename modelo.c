@@ -590,6 +590,11 @@ void draw( )
 
 Ejes ejesCoordenadas;
 
+void ColorSeleccion(int i){
+  unsigned char r = (i & 0xFF);
+  glColor3ub(r, 0, 0);
+}
+
 void segmento(){
   glPushMatrix();
     // esfera inferior del segmento
@@ -659,6 +664,7 @@ void dibujar_pieza(){
     glRotatef(angY, 0, 1, 0);
     // esfera grande que actua como base para el brazo
     glScalef(5, 5, 5);
+    ColorSeleccion(1);
     esfera.draw();
     glScalef(0.2, 0.2, 0.2);
     glTranslatef(0, 4, 0);
@@ -673,6 +679,7 @@ void dibujar_pieza(){
     glRotatef(angX2, rx, 0, -rz);
     glRotatef(angY, 0, 1, 0);
     // dibujo una esfera que actua como unión de ambos segmentos
+    ColorSeleccion(2);
     glScalef(3, 3, 3);
     esfera.draw();
     glScalef(0.3, 0.3, 0.3);
@@ -688,6 +695,7 @@ void dibujar_pieza(){
     glRotatef(angX3, rx, 0, -rz);
     glRotatef(angY, 0, 1, 0);
     // dibujo de nuevo la esfera de conexión
+    ColorSeleccion(3);
     glScalef(3, 3, 3);
     esfera.draw();
     glScalef(0.3, 0.3, 0.3);
@@ -701,6 +709,7 @@ void dibujar_pieza(){
       glRotatef(20, 1, 0, 0);
       glRotatef(-angX4, 1, 0, 0);
       glTranslatef(0, 0, 1);
+      ColorSeleccion(4);
       // primer gancho
       gancho();
     glPopMatrix();
@@ -709,6 +718,7 @@ void dibujar_pieza(){
       glRotatef(-20, 1, 0, 0);
       glRotatef(angX4, 1, 0, 0);
       glTranslatef(0, 0, -1);
+      ColorSeleccion(4);
       // segundo gancho
       gancho();
     glPopMatrix();
@@ -726,15 +736,14 @@ Procedimiento de dibujo del modelo. Es llamado por glut cada vez que se debe red
 
 bool b = true;
 
-void Dibuja (void)
-{
+void dibujoEscena(bool ver){
   static GLfloat  pos[4] = { 5.0, 5.0, 10.0, 0.0 };	// Posicion de la fuente de luz
 
   float  color[4] = { 1, 1, 1, 1 };
 
   glPushMatrix ();		// Apila la transformacion geometrica actual
 
-  glClearColor (0.6, 0.6, 0.6, 1.0);	// Fija el color de fondo a un gris claro
+  glClearColor (0.0, 0.0, 0.0, 1.0);	// Fija el color de fondo a un gris claro
 
   glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Inicializa el buffer de color y el Z-Buffer
 
@@ -742,9 +751,8 @@ void Dibuja (void)
 
   glLightfv (GL_LIGHT0, GL_POSITION, pos);	// Declaracion de luz. Colocada aqui esta fija en la escena
 
-  ejesCoordenadas.draw();			// Dibuja los ejes
-
-  glMaterialfv (GL_FRONT, GL_AMBIENT_AND_DIFFUSE, color);
+  if(ver)
+    ejesCoordenadas.draw();			// Dibuja los ejes
 
   if(b){
     esfera.asignarTextura("texturas/milo.jpg");
@@ -752,13 +760,48 @@ void Dibuja (void)
     b = false;
   }
 
-  glEnable(GL_TEXTURE_2D);
+  glMaterialfv (GL_FRONT, GL_AMBIENT_AND_DIFFUSE, color);
+
+  if(ver)
+    glEnable(GL_TEXTURE_2D);
+  dibujar_pieza();
+  if(ver)
+    glDisable(GL_TEXTURE_2D);
+
+  glPopMatrix ();		// Desapila la transformacion geometrica
+}
+
+int pick(int x, int y, int *i){
+  GLint viewport[4];
+  unsigned char data[4];
+
+  glGetIntegerv(GL_VIEWPORT, viewport);
+  glDisable(GL_DITHER);
+  glDisable(GL_LIGHTING);
+  glDisable(GL_TEXTURE_2D);
+  dibujoEscena(false);
+  glEnable(GL_DITHER);
+  glEnable(GL_LIGHTING);
+  //glEnable(GL_TEXTURE_2D);
+  glFlush();
+  //glFinish();
+
+  glReadPixels(x, viewport[3]-y, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+  *i = data[0];
+
+  glutPostRedisplay();
+
+  std::cout << "ID del objeto seleccionado: " << *i << std::endl;
+  return *i;
+}
+
+void Dibuja (void)
+{
   glEnable(GL_LIGHTING);
   glEnable(GL_DITHER);
 
-  dibujar_pieza();
-
-  glPopMatrix ();		// Desapila la transformacion geometrica
+  dibujoEscena(true);
 
   glutSwapBuffers ();		// Intercambia el buffer de dibujo y visualizacion
 }

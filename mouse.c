@@ -66,6 +66,8 @@ if(boton==GLUT_LEFT_BUTTON && estado==GLUT_DOWN) {
 	MOUSE_LEFT_DOWN=1;
 	MOUSE_X=x;
 	MOUSE_Y=y;
+	int i;
+	pick(x, y, &i);
 	}
 else if(boton==GLUT_MIDDLE_BUTTON && estado==GLUT_DOWN) {
 	MOUSE_MIDDLE_DOWN=1;

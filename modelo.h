@@ -27,6 +27,8 @@
 	 modelo.h
 */
 
+int pick(int x, int y, int *i);
+
 /**
 	Funcion de redibujado. Se ejecuta con los eventos postRedisplay
 **/
