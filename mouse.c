@@ -68,6 +68,7 @@ if(boton==GLUT_LEFT_BUTTON && estado==GLUT_DOWN) {
 	MOUSE_Y=y;
 	int i;
 	pick(x, y, &i);
+	seleccion = i;
 	}
 else if(boton==GLUT_MIDDLE_BUTTON && estado==GLUT_DOWN) {
 	MOUSE_MIDDLE_DOWN=1;
@@ -101,27 +102,55 @@ x,y: Posicion, en coordenadas de pantalla, en que se encuantra el cursor.
 
 void RatonMovido( int x, int y )
 {
-char texto[30];
-float ax,ay,az,d;
-getCamara (ax, ay, az, d);
-	if(MOUSE_LEFT_DOWN) {
-		if(x!=MOUSE_X) ay+=x-MOUSE_X;
-		if(y!=MOUSE_Y) ax+=y-MOUSE_Y;
-		setCamara (ax, ay, az,  d);
+if(seleccion == 128){
+	char texto[30];
+	float ax,ay,az,d;
+	getCamara (ax, ay, az, d);
+		if(MOUSE_LEFT_DOWN) {
+			if(x!=MOUSE_X) ay+=x-MOUSE_X;
+			if(y!=MOUSE_Y) ax+=y-MOUSE_Y;
+			setCamara (ax, ay, az,  d);
+			}
+		else if(MOUSE_RIGHT_DOWN) {
+		//   if(x!=MOUSE_X) z_camara=10.0*(anchoVentana/2-MOUSE_X)/(x+1.0);
+		if(y!=MOUSE_Y) {
+			d+=100.0*(y-MOUSE_Y)/200; //escalar el zoom
+			setCamara (ax,  ay,  az,  d);
+			}
 		}
-	else if(MOUSE_RIGHT_DOWN) {
-	//   if(x!=MOUSE_X) z_camara=10.0*(anchoVentana/2-MOUSE_X)/(x+1.0);
-	if(y!=MOUSE_Y) {
-		d+=100.0*(y-MOUSE_Y)/200; //escalar el zoom
-		setCamara (ax,  ay,  az,  d);
-		}
-	 }
-	else if(MOUSE_MIDDLE_DOWN) {
-		if(x!=MOUSE_X) az+=x-MOUSE_X;
-		if(y!=MOUSE_Y) ax+=y-MOUSE_Y;
-		setCamara ( ax,  ay,  az,  d);
-		}
+		else if(MOUSE_MIDDLE_DOWN) {
+			if(x!=MOUSE_X) az+=x-MOUSE_X;
+			if(y!=MOUSE_Y) ax+=y-MOUSE_Y;
+			setCamara ( ax,  ay,  az,  d);
+			}
+		MOUSE_X=x;
+		MOUSE_Y=y;
+	glutPostRedisplay();
+}
+else{
+	const float factor = 0.2;
+	float nang;
+	switch (seleccion)
+	{
+	case 1:
+		angX += (y-MOUSE_Y)*factor;
+		break;
+	case 2:
+		angX2 += (y-MOUSE_Y)*factor;
+		break;
+	case 3:
+		angX3 += (y-MOUSE_Y)*factor;
+		break;
+	case 4:
+		nang = angX4+(y-MOUSE_Y)*factor;
+		if(0 < nang && nang < 35)
+			angX4 = nang;
+		break;
+	default:
+		break;
+	}
+	angY += (x-MOUSE_X)*factor;
 	MOUSE_X=x;
 	MOUSE_Y=y;
-glutPostRedisplay();
+}
 }

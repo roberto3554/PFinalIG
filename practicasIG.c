@@ -53,6 +53,12 @@ float velX2 = 1.0;
 float velX3 = 1.0;
 float velX4 = 1.0;
 
+float objX  = 0.0;
+float objY  = 0.0;
+float objZ  = 0.0;
+
+int seleccion = 0;
+
 /*=================================================*/
 
 /**	int main( int argc, char *argv[] )	

@@ -48,3 +48,9 @@ extern float velX;
 extern float velX2;
 extern float velX3;
 extern float velX4;
+
+extern float objX;
+extern float objY;
+extern float objZ;
+
+extern int seleccion;

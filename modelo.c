@@ -722,7 +722,15 @@ void dibujar_pieza(){
       // segundo gancho
       gancho();
     glPopMatrix();
+
   glPopMatrix();
+
+  glPointSize(2);
+  glBegin(GL_POINTS);
+    glColor3f(1, 0, 0);
+    glVertex3f(objX, objY, objZ);
+    std::cout << objX << ", " << objY << ", " << objZ << std::endl;
+  glEnd();
 }
 
 /**	void Dibuja( void )
@@ -743,7 +751,7 @@ void dibujoEscena(bool ver){
 
   glPushMatrix ();		// Apila la transformacion geometrica actual
 
-  glClearColor (0.0, 0.0, 0.0, 1.0);	// Fija el color de fondo a un gris claro
+  glClearColor (0.5, 0.5, 0.5, 1.0);	// Fija el color de fondo a un gris claro
 
   glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Inicializa el buffer de color y el Z-Buffer
 
@@ -755,8 +763,8 @@ void dibujoEscena(bool ver){
     ejesCoordenadas.draw();			// Dibuja los ejes
 
   if(b){
-    esfera.asignarTextura("texturas/milo.jpg");
-    cubo.asignarTextura("texturas/metal.jpg");
+    esfera.asignarTextura("texturas/agua.jpg");
+    cubo.asignarTextura("texturas/magma.jpg");
     b = false;
   }
 
@@ -792,7 +800,7 @@ int pick(int x, int y, int *i){
 
   glutPostRedisplay();
 
-  std::cout << "ID del objeto seleccionado: " << *i << std::endl;
+  // std::cout << "ID del objeto seleccionado: " << *i << std::endl;
   return *i;
 }
 
