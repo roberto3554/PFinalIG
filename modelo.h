@@ -29,6 +29,10 @@
 
 int pick(int x, int y, int *i);
 
+void obtener_punto(void (*func)(), float x, float y, float z);
+
+void trasnformaciones();
+
 /**
 	Funcion de redibujado. Se ejecuta con los eventos postRedisplay
 **/

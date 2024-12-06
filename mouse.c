@@ -145,6 +145,8 @@ else{
 		nang = angX4+(y-MOUSE_Y)*factor;
 		if(0 < nang && nang < 35)
 			angX4 = nang;
+		else if(nang > 35)
+			obtener_punto(trasnformaciones, 0, 0, 0);
 		break;
 	default:
 		break;

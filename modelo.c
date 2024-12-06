@@ -725,12 +725,84 @@ void dibujar_pieza(){
 
   glPopMatrix();
 
-  glPointSize(2);
+  glPointSize(5);
   glBegin(GL_POINTS);
     glColor3f(1, 0, 0);
     glVertex3f(objX, objY, objZ);
-    std::cout << objX << ", " << objY << ", " << objZ << std::endl;
+    // std::cout << objX << ", " << objY << ", " << objZ << std::endl;
   glEnd();
+}
+
+void imprime_matriz(float *matriz){
+  std::cout << std::endl;
+  for(int i=0; i<4; i++){
+    std::cout << matriz[i] << ", " << matriz[i+4] << ", " << matriz[i+8] << ", " <<matriz[i+12] << std::endl;
+  }
+}
+
+void transforma_punto(GLfloat* puntoLocal, GLfloat* matriz, GLfloat* puntoGlobal){
+  for(int i=0; i<4; i++){
+    puntoGlobal[i] = 0;
+    for(int j=0; j<4; j++){
+      puntoGlobal[i] += matriz[i+j*4]*puntoLocal[j];
+    }
+  }
+}
+
+void obtener_punto(void (*func)(), float x, float y, float z){
+  glPushMatrix();
+    // Se tiene que cargar la identidad y luego volver a aplicar todas las transformaciones
+    // Eso es por que en GL_MODELVIEW_MATRIX se guardan tanto las transformaciones de los modelos como las de la vista
+    glLoadIdentity();
+    func();
+    GLfloat transform[16];
+    glGetFloatv(GL_MODELVIEW_MATRIX, transform);
+    // imprime_matriz(transform);
+    float point[4] = {x, y, z, 1};
+    float point2[4];
+    transforma_punto(point, transform, point2);
+    // std::cout << "punto: " << point2[0] << ", " << point2[1] << ", " << point2[2] << ", " << point2[3] << std::endl;
+    objX = point2[0];
+    objY = point2[1];
+    objZ = point2[2];
+  glPopMatrix();
+}
+
+void trasnformaciones(){
+  float rx, rz;
+  if(angY < 0)
+    angY += 360;
+  if(fmod(angY, 360)<90){
+    rz = fmod(angY, 90)/90;
+    rx = 1-rz;
+  }
+  else if(fmod(angY, 360)<180){
+    rz = 1-(fmod(angY, 90)/90);
+    rx = -(1-rz);
+  }
+  else if(fmod(angY, 360)<270){
+    rz = -(fmod(angY, 90)/90);
+    rx = -(1+rz);
+  }
+  else if(fmod(angY, 360)<360){
+    rz = -(1-(fmod(angY, 90)/90));
+    rx = (1+rz);
+  }
+
+  glRotatef(angX, rx, 0, -rz);
+  glRotatef(angY, 0, 1, 0);
+  glTranslatef(0, 4, 0);
+  glTranslatef(0, 11.5, 0);
+  glRotatef(-angY, 0, 1, 0);
+  glRotatef(angX2, rx, 0, -rz);
+  glRotatef(angY, 0, 1, 0);
+  glTranslatef(0, 2, 0);
+  glTranslatef(0, 11.5, 0);
+  glRotatef(-angY, 0, 1, 0);
+  glRotatef(angX3, rx, 0, -rz);
+  glRotatef(angY, 0, 1, 0);
+  glTranslatef(0, 2, 0);
+  glTranslatef(0, 10, 0);  
 }
 
 /**	void Dibuja( void )
