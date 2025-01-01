@@ -102,7 +102,7 @@ x,y: Posicion, en coordenadas de pantalla, en que se encuantra el cursor.
 
 void RatonMovido( int x, int y )
 {
-if(seleccion == 128){
+if(seleccion > 4){
 	char texto[30];
 	float ax,ay,az,d;
 	getCamara (ax, ay, az, d);
@@ -134,19 +134,31 @@ else{
 	{
 	case 1:
 		angX += (y-MOUSE_Y)*factor;
+		if(angX > 360)
+			angX = 0;
+		else if(angX < 0)
+			angX = 360;
 		break;
 	case 2:
 		angX2 += (y-MOUSE_Y)*factor;
+		if(angX2 > 360)
+			angX2 = 0;
+		else if(angX2 < 0)
+			angX2 = 360;
 		break;
 	case 3:
 		angX3 += (y-MOUSE_Y)*factor;
+		if(angX3 > 360)
+			angX3 = 0;
+		else if(angX3 < 0)
+			angX3 = 360;
 		break;
 	case 4:
 		nang = angX4+(y-MOUSE_Y)*factor;
 		if(0 < nang && nang < 35)
 			angX4 = nang;
 		else if(nang > 35)
-			obtener_punto(trasnformaciones, 0, 0, 0);
+			coli();
 		break;
 	default:
 		break;

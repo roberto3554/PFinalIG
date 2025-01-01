@@ -33,6 +33,8 @@ void obtener_punto(void (*func)(), float x, float y, float z);
 
 void trasnformaciones();
 
+void coli();
+
 /**
 	Funcion de redibujado. Se ejecuta con los eventos postRedisplay
 **/

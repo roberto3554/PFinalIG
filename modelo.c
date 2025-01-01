@@ -450,16 +450,74 @@ class Malla:Objeto3D
 Malla cubo("modelos/cubo.ply", N_VERT);
 Malla esfera("modelos/esfera.ply", N_VERT);
 
+bool c = false;
+
 class Cubo:Objeto3D
 {
 public:
   float lado;
+  GLuint idText;
+  float x, y, z;
 Cubo(float lado){
   this->lado=lado;
 }
+
+Cubo(float lado, float x, float y, float z) : Cubo(lado){
+  this->x = x;
+  this->y = y;
+  this->z = z;
+}
+
+void move(float x, float y, float z){
+  this->x += x;
+  this->y += y;
+  this->z += z;
+}
+
+bool collision(float x, float y, float z){
+  if(x > this->x && x < this->x+lado){
+    if(y > this->y && y < this->y+lado){
+      if(z > this->z && z < this->z+lado)
+        return true;
+    }
+  }
+  return false;
+}
+
+void asignarTextura(const char* nombre_arch){
+  GLuint a;
+  glGenTextures(1, &a);
+  idText = a;
+  glBindTexture(GL_TEXTURE_2D, idText);
+
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+  unsigned ancho;
+  unsigned alto;
+  unsigned char* img = LeerArchivoJPEG(nombre_arch, ancho, alto);
+
+  glTexImage2D(
+    GL_TEXTURE_2D,
+    0,
+    GL_RGB,
+    ancho,
+    alto,
+    0,
+    GL_RGB,
+    GL_UNSIGNED_BYTE,
+    img
+  );
+}
+
 // Dibuja el objeto
 void draw( ){
   //glDisable (GL_LIGHTING);
+
+  glTranslatef(x, y, z);
+
   glBegin (GL_QUADS);
   {
     // Primer lado (derecho)
@@ -502,10 +560,112 @@ void draw( ){
   glEnd();
   //glEnable (GL_LIGHTING);
 }
+
+void drawText( ){
+  glTranslatef(x, y, z);
+  //glDisable (GL_LIGHTING);
+  //glEnable(GL_TEXTURE_2D);
+  glBindTexture(GL_TEXTURE_2D, idText);
+  glBegin (GL_QUADS);
+  {
+    // Primer lado (derecho)
+    glNormal3f(1.0, 0.0, 0.0);
+
+    glTexCoord2f(1, 0.75);
+    glVertex3f(lado, 0, 0);
+
+    glTexCoord2f(1, 0.5);
+    glVertex3f(lado, lado, 0);
+
+    glTexCoord2f(0.75, 0.5);
+    glVertex3f(lado, lado, lado);
+
+    glTexCoord2f(0.75, 0.75);
+    glVertex3f(lado, 0, lado);
+
+    // Segundo lado (frente)
+    glNormal3f(0.0, 0.0, 1.0);
+
+    glTexCoord2f(0.75, 0.75);
+    glVertex3f(lado, 0, lado);
+
+    glTexCoord2f(0.75, 0.5);
+    glVertex3f(lado, lado, lado);
+
+    glTexCoord2f(0.5, 0.5);
+    glVertex3f(0, lado, lado);
+
+    glTexCoord2f(0.5, 0.75);
+    glVertex3f(0, 0, lado);
+
+    // Tercer lado (arriba)
+    glNormal3f(0.0, 1.0, 0.0);
+
+    glTexCoord2f(0.75, 0.25);
+    glVertex3f(lado, lado, 0);
+
+    glTexCoord2f(0.5, 0.25);
+    glVertex3f(0, lado, 0);
+
+    glTexCoord2f(0.5, 0.5);
+    glVertex3f(0, lado, lado);
+
+    glTexCoord2f(0.75, 0.5);
+    glVertex3f(lado, lado, lado);
+
+    // Cuarto lado (izquierdo)
+    glNormal3f(-1.0, 0.0, 0.0);
+
+    glTexCoord2f(0.5, 0.75);
+    glVertex3f(0, 0, lado);
+
+    glTexCoord2f(0.5, 0.5);
+    glVertex3f(0, lado, lado);
+
+    glTexCoord2f(0.25, 0.5);
+    glVertex3f(0, lado, 0);
+
+    glTexCoord2f(0.25, 0.75);
+    glVertex3f(0, 0, 0);
+
+    // Quinto lado (fondo)
+    glNormal3f(0.0, 0.0, -1.0);
+
+    glTexCoord2f(0.25, 0.75);
+    glVertex3f(0, 0, 0);
+
+    glTexCoord2f(0.25, 0.5);
+    glVertex3f(0, lado, 0);
+
+    glTexCoord2f(0, 0.5);
+    glVertex3f(lado, lado, 0);
+
+    glTexCoord2f(0, 0.75);
+    glVertex3f(lado, 0, 0);
+
+    // Sexto lado (base)
+    glNormal3f(0.0, -1.0, 0.0);
+
+    glTexCoord2f(0.75, 0.75);
+    glVertex3f(lado, 0, lado);
+
+    glTexCoord2f(0.5, 0.75);
+    glVertex3f(0, 0, lado);
+
+    glTexCoord2f(0.5, 1);
+    glVertex3f(0, 0, 0);
+
+    glTexCoord2f(0.75, 1);
+    glVertex3f(lado, 0, 0);
+  }
+  glEnd();
+  //glDisable(GL_TEXTURE_2D);
+  //glEnable (GL_LIGHTING);
+}
+
 } ;
 
-Cubo cubo1(4);
-Cubo cubo2(2);
+Cubo cubo1(5, 15, 0, 15);
 
 class Piramide:Objeto3D
 {
@@ -633,6 +793,13 @@ void gancho(){
   glPopMatrix();
 }
 
+void coli(){
+  if(cubo1.collision(objX, objY, objZ))
+    c = true;
+  else
+    c = false;
+}
+
 // funcion que dibuja la pieza final, es la que instancia a las otras dos
 void dibujar_pieza(){
   // Todos los if else se usan para calcular la rotación que tendra que tener 
@@ -723,14 +890,23 @@ void dibujar_pieza(){
       gancho();
     glPopMatrix();
 
+    if(angX4 > 34.5){
+      float old_x = objX;
+      float old_y = objY;
+      float old_z = objZ;
+			obtener_punto(trasnformaciones, 0, 0, 0);
+      if(c)
+        cubo1.move(objX-old_x, objY-old_y, objZ-old_z);
+    }
+
   glPopMatrix();
 
-  glPointSize(5);
-  glBegin(GL_POINTS);
-    glColor3f(1, 0, 0);
-    glVertex3f(objX, objY, objZ);
-    // std::cout << objX << ", " << objY << ", " << objZ << std::endl;
-  glEnd();
+  // glPointSize(5);
+  // glBegin(GL_POINTS);
+  //   glColor3f(1, 0, 0);
+  //   glVertex3f(objX, objY, objZ);
+  //   // std::cout << objX << ", " << objY << ", " << objZ << std::endl;
+  // glEnd();
 }
 
 void imprime_matriz(float *matriz){
@@ -791,18 +967,19 @@ void trasnformaciones(){
 
   glRotatef(angX, rx, 0, -rz);
   glRotatef(angY, 0, 1, 0);
-  glTranslatef(0, 4, 0);
-  glTranslatef(0, 11.5, 0);
+  glTranslatef(0, 15.5, 0);
   glRotatef(-angY, 0, 1, 0);
   glRotatef(angX2, rx, 0, -rz);
   glRotatef(angY, 0, 1, 0);
-  glTranslatef(0, 2, 0);
-  glTranslatef(0, 11.5, 0);
+  glTranslatef(0, 13.5, 0);
   glRotatef(-angY, 0, 1, 0);
   glRotatef(angX3, rx, 0, -rz);
   glRotatef(angY, 0, 1, 0);
-  glTranslatef(0, 2, 0);
-  glTranslatef(0, 10, 0);  
+  if(angX3 < 180)
+    glTranslatef(0, 2+(angX3*2/180), angX3/60);
+  else
+    glTranslatef(0, 2+((360-angX3)*2/180), -(360-angX3)/60);
+  glTranslatef(0, 10, 0);
 }
 
 /**	void Dibuja( void )
@@ -837,6 +1014,7 @@ void dibujoEscena(bool ver){
   if(b){
     esfera.asignarTextura("texturas/agua.jpg");
     cubo.asignarTextura("texturas/magma.jpg");
+    cubo1.asignarTextura("texturas/dado.jpg");
     b = false;
   }
 
@@ -845,6 +1023,7 @@ void dibujoEscena(bool ver){
   if(ver)
     glEnable(GL_TEXTURE_2D);
   dibujar_pieza();
+  cubo1.drawText();
   if(ver)
     glDisable(GL_TEXTURE_2D);
 
